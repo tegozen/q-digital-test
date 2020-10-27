@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import ROUTES from './routes';
-import Pages from './pages';
 
 export class App extends React.Component {
   render() {
