@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import Redux from './js/redux';
+import './scss/index.scss';
 
 const store = createStore(Redux.Reducers, Redux.InitialState);
 
