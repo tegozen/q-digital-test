@@ -1,6 +1,8 @@
-@import './components/reset.scss';
+@import "./components/reset.scss";
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
 }
@@ -23,5 +25,37 @@ html, body, #root {
     background-color: black;
     color: white;
     cursor: pointer;
+    &.button_switch {
+      margin-bottom: 10px;
+    }
   }
+
+  .sliderWrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    .slider {
+      background-color: black;
+      width: 600px;
+      height: 400px;
+      object-fit: contain;
+      margin: 10px;
+    }
+  }
+}
+
+.preloader {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
