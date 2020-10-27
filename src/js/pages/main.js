@@ -2,15 +2,8 @@ import React from 'react';
 import * as THREE from 'three';
 
 export default class Main extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      width: 1,
-      height: 1,
-    }
-  }
-
   componentDidMount() {
+    window.addEventListener('resize', this.onWindowResize, false);
     this.parent = document.getElementById('threejs')
     let { width, height } = this.parent.getBoundingClientRect();
     this.scene = new THREE.Scene();
@@ -34,11 +27,25 @@ export default class Main extends React.Component {
     this.camera.position.y = 2;
     this.camera.rotation.x = THREE.MathUtils.degToRad(-20)
 
-    this.setState({ width, height }, () => {
-      this.renderer.setSize(width, height);
-      this.parent.appendChild(this.renderer.domElement);
-      this.animate();
-    })
+
+    this.width = width;
+    this.height = height;
+    this.renderer.setSize(width, height);
+    this.parent.appendChild(this.renderer.domElement);
+    this.animate();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onWindowResize);
+  }
+
+  onWindowResize = () => {
+    let { width, height } = this.parent.getBoundingClientRect();
+    this.width = width;
+    this.height = height;
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
   }
 
   animate = () => {
