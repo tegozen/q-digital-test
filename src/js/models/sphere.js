@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import Common from './common';
 import Location from './location';
+import data from '../data';
 
 export default class Sphere extends Common {
   constructor(props) {
     super(props);
+    this.app = props.app;
   }
 
   init = async () => {
@@ -17,5 +19,20 @@ export default class Sphere extends Common {
         resolve(this)
       })
     })
+  }
+
+  changeTo = async (index) => {
+    let location = this.app.locations[index];
+    let _data = data[index];
+    if (!location) {
+      location = this.app.locations[index] = new Location({ app: this.app, ..._data })
+    }
+
+    if (!location.texture) {
+      await location.load()
+    }
+
+    this.mesh.material.map = location.texture;
+    location.generateArrows()
   }
 }
