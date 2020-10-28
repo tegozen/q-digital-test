@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Common from './common';
 import Location from './location';
 import data from '../data';
+import api from '../api';
 
 export default class Sphere extends Common {
   constructor(props) {
@@ -23,7 +24,7 @@ export default class Sphere extends Common {
 
   changeTo = async (index) => {
     let location = this.app.locations[index];
-    let _data = data[index];
+    let _data = api.dataByid(index)
     if (!location) {
       location = this.app.locations[index] = new Location({ app: this.app, ..._data })
     }
@@ -33,6 +34,6 @@ export default class Sphere extends Common {
     }
 
     this.mesh.material.map = location.texture;
-    location.generateArrows()
+    return await location.generateArrows()
   }
 }

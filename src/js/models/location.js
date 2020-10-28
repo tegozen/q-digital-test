@@ -27,11 +27,11 @@ export default class Location {
         this.app.scene.remove(child)
       })
 
-      this.siblings.map(id => {
-        this.arrows[id] = new Arrow()
+      resolve(this.siblings.map(id => {
+        this.arrows[id] = new Arrow({ id })
         this.app.scene.add(this.arrows[id].mesh)
-      })
-      resolve()
+        return this.arrows[id]
+      }))
     })
   }
 }
