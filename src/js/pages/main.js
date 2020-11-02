@@ -2,7 +2,7 @@ import React from 'react';
 import * as THREE from 'three';
 import Models from '../models';
 import data from '../data'
-const TWEEN = require('@tweenjs/tween.js')
+import TWEEN from "@tweenjs/tween.js";
 
 export default class Main extends React.Component {
   EVENTS = [
@@ -51,15 +51,15 @@ export default class Main extends React.Component {
 
 
     this.sphereOther = new Models.Sphere({ app: this })
-    await this.sphereOther.init();
-    this.sphereOther.mesh.position.z = -10;
+    await this.sphereOther.init(0);
+    this.sphereOther.mesh.position.z = this.sphereOther.defaultPos;
     this.scene.add(this.sphereOther.mesh);
 
     this.width = width;
     this.height = height;
     this.renderer.setSize(width, height);
     this.parent.appendChild(this.renderer.domElement);
-    this.animate();
+    requestAnimationFrame(this.animate);
 
     await this.sphere.changeTo(1);
   }
@@ -154,14 +154,13 @@ export default class Main extends React.Component {
 
   cameraToMarker = (arrow) => {
     const siblingData = data.find(({ id }) => id === arrow.id);
-    const currentData = data.find(({ id }) => id === this.currentId);
 
     const unit_vec = this.getUnicVector(
-      currentData.coords,
+      { x: 0, y: 0, z: 0 },
       siblingData.coords
     );
 
-    const coefficient = 8;
+    const coefficient = 1;
     const newCoords = {
       x: unit_vec.x * coefficient,
       y: unit_vec.y * coefficient,
@@ -178,7 +177,57 @@ export default class Main extends React.Component {
     this.lon = THREE.Math.radToDeg(this.theta);
     this.lat = 90 - THREE.Math.radToDeg(this.phi);
 
-    //todo animate
+    this.sphereOther.changePosition(
+      newCoords.x,
+      newCoords.y,
+      newCoords.z
+    )
+
+    this.sphereOther.changeTo(arrow.id, false)
+
+    let settings = {
+      x: this.sphereOther.mesh.position.x,
+      y: this.sphereOther.mesh.position.y,
+      z: this.sphereOther.mesh.position.z,
+      opacityOther: 0,
+      opacityMain: 1,
+    };
+
+    setTimeout(() => {
+
+      this.arrows.forEach(arrow => {
+        this.scene.remove(arrow.mesh)
+      })
+
+      this.arrows = []
+
+
+      new TWEEN.Tween(settings)
+        .to({
+          x: this.sphere.mesh.position.x,
+          y: this.sphere.mesh.position.y,
+          z: this.sphere.mesh.position.z,
+          opacityOther: 1,
+          opacityMain: 0
+        }, 2500)
+        .onUpdate(() => {
+          this.sphereOther.changeOpacity(settings.opacityOther)
+          this.sphereOther.changePosition(
+            settings.x,
+            settings.y,
+            settings.z
+          );
+          this.sphere.changeOpacity(settings.opacityMain)
+        })
+        .start()
+        .onComplete(() => {
+          this.sphereOther.reset()
+          this.sphere.changeTo(arrow.id)
+          this.sphere.changeOpacity(1)
+        })
+    }, 500);
+
+
   }
 
   onWindowResize = () => {
@@ -190,7 +239,8 @@ export default class Main extends React.Component {
     this.renderer.setSize(width, height);
   }
 
-  animate = () => {
+  animate = (time) => {
+    TWEEN.update(time);
     requestAnimationFrame(this.animate);
 
     this.lat = Math.max(-85, Math.min(85, this.lat));

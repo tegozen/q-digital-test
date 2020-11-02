@@ -3,9 +3,9 @@ const data = [
     id: 1,
     path: "locations/pano_1.png",
     coords: {
-      x: 0,
+      x: 2,
       y: 0,
-      z: 0
+      z: -.1
     },
     siblings: [2, 3]
   },

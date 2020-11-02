@@ -8,7 +8,6 @@ export default class Location {
     this.app = app;
     this.id = id;
     this.siblings = siblings;
-    this.arrows = {}
   }
 
   load = () => {
@@ -21,16 +20,12 @@ export default class Location {
   }
 
   generateArrows = () => {
-    this.arrows = {}
     return new Promise(resolve => {
-      this.app.scene.children.filter(child => child.name === 'arrow').forEach(child => {
-        this.app.scene.remove(child)
-      })
-
+      let arrows = {}
       resolve(this.siblings.map(id => {
-        this.arrows[id] = new Arrow({ id, app: this.app })
-        this.app.scene.add(this.arrows[id].mesh)
-        return this.arrows[id]
+        arrows[id] = new Arrow({ id, app: this.app })
+        this.app.scene.add(arrows[id].mesh)
+        return arrows[id]
       }))
     })
   }
