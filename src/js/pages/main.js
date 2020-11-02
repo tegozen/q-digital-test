@@ -1,6 +1,8 @@
 import React from 'react';
 import * as THREE from 'three';
 import Models from '../models';
+import data from '../data'
+const TWEEN = require('@tweenjs/tween.js')
 
 export default class Main extends React.Component {
   EVENTS = [
@@ -23,6 +25,8 @@ export default class Main extends React.Component {
   phi = 0;
   theta = 0;
   arrows = [];
+  radius = 10;
+  currentId;
 
   async componentDidMount() {
     this.initEvents();
@@ -99,7 +103,7 @@ export default class Main extends React.Component {
     if (deltaX < 20 && deltaY < 20) {
       let arrow = this.detectClickByArrow();
       if (arrow) {
-        
+        this.cameraToMarker(arrow)
       }
     }
 
@@ -117,7 +121,7 @@ export default class Main extends React.Component {
         let distances = this.arrows.map((self) => {
           let { id, triangle } = self;
           let position = triangle.getWorldPosition();
-          return { id, distance: main.point.distanceTo(position), self }
+          return { id, distance: main.point.distanceTo(position), self, position }
         })
 
 
@@ -134,6 +138,49 @@ export default class Main extends React.Component {
     return false
   }
 
+  getUnicVector(currentCoords, siblingCoords) {
+    const vec = {
+      x: (siblingCoords.x - currentCoords.x),
+      y: (siblingCoords.y - currentCoords.y),
+      z: (siblingCoords.z - currentCoords.z)
+    }
+    const len_vec = Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2);
+    return {
+      x: vec.x / len_vec,
+      y: vec.y / len_vec,
+      z: vec.z / len_vec
+    }
+  }
+
+  cameraToMarker = (arrow) => {
+    const siblingData = data.find(({ id }) => id === arrow.id);
+    const currentData = data.find(({ id }) => id === this.currentId);
+
+    const unit_vec = this.getUnicVector(
+      currentData.coords,
+      siblingData.coords
+    );
+
+    const coefficient = 8;
+    const newCoords = {
+      x: unit_vec.x * coefficient,
+      y: unit_vec.y * coefficient,
+      z: unit_vec.z * coefficient,
+    };
+
+    this.camera.target.x = newCoords.x;
+    this.camera.target.y = 0;
+    this.camera.target.z = newCoords.z
+
+    this.radius = (Math.hypot(...Object.values(newCoords)))
+    this.phi = Math.acos(newCoords.y / this.radius);
+    this.theta = Math.atan2(newCoords.z, newCoords.x);
+    this.lon = THREE.Math.radToDeg(this.theta);
+    this.lat = 90 - THREE.Math.radToDeg(this.phi);
+
+    //todo animate
+  }
+
   onWindowResize = () => {
     let { width, height } = this.parent.getBoundingClientRect();
     this.width = width;
@@ -144,16 +191,16 @@ export default class Main extends React.Component {
   }
 
   animate = () => {
-    // setTimeout(this.animate, 1000);
     requestAnimationFrame(this.animate);
 
     this.lat = Math.max(-85, Math.min(85, this.lat));
     this.phi = THREE.MathUtils.degToRad(90 - this.lat);
     this.theta = THREE.MathUtils.degToRad(this.lon);
 
-    this.camera.target.x = this.cameraD * Math.sin(this.phi) * Math.cos(this.theta);
-    this.camera.target.y = this.cameraD * Math.cos(this.phi);
-    this.camera.target.z = this.cameraD * Math.sin(this.phi) * Math.sin(this.theta);
+    this.camera.target.x = this.radius * Math.sin(this.phi) * Math.cos(this.theta);
+    this.camera.target.y = this.radius * Math.cos(this.phi);
+    this.camera.target.z = this.radius * Math.sin(this.phi) * Math.sin(this.theta);
+    this.radius = (Math.hypot(...Object.values(this.camera.target)))
 
     this.camera.lookAt(this.camera.target);
     this.renderer.render(this.scene, this.camera);

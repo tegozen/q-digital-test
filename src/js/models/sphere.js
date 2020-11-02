@@ -35,6 +35,7 @@ export default class Sphere extends Common {
 
     this.mesh.material.map = location.texture;
     this.app.arrows = await location.generateArrows();
+    this.app.currentId = index;
     return this.app.arrows 
   }
 }
