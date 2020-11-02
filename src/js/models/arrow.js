@@ -7,6 +7,7 @@ export default class Arrow extends Common {
   constructor(props) {
     super(props);
     this.id = props.id;
+    this.app = props.app;
     this.planeWidth = .1;
     this.planeHeight = .3;
     this.init()
@@ -14,20 +15,33 @@ export default class Arrow extends Common {
 
   init = () => {
     this.mesh = new THREE.Group()
-    this.mesh.position.y = -(this.planeWidth * 2)
+    let group = new THREE.Group()
+    group.position.y = -(this.planeWidth * 2)
+    group.rotation.y = THREE.MathUtils.degToRad(-90)
 
     let geometry = new THREE.PlaneGeometry(this.planeWidth, this.planeHeight)
-    let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+    let material = new THREE.MeshStandardMaterial({ visible: false });
     let plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = THREE.MathUtils.degToRad(-90)
     plane.rotation.z = THREE.MathUtils.degToRad(90)
     plane.position.x = this.planeHeight / 2
-    this.mesh.add(plane)
+    group.add(plane)
 
     let _data = api.dataByid(this.id)
-    console.log(_data)
 
-    this.mesh.add(this.createTriangle())
+    let triangle = this.createTriangle()
+    group.add(triangle)
+
+    this.mesh.add(group)
+
+    let { x, y, z } = _data.coords;
+    this.lookAt(new THREE.Vector3(x, y, z))
+  }
+
+  lookAt = (x = 0, y = 0, z = 0) => {
+    this.mesh.lookAt(x, y, z)
+    this.mesh.rotation.x = 0
+    this.mesh.rotation.z = 0
   }
 
   createTriangle = () => {

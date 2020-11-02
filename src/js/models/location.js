@@ -28,7 +28,7 @@ export default class Location {
       })
 
       resolve(this.siblings.map(id => {
-        this.arrows[id] = new Arrow({ id })
+        this.arrows[id] = new Arrow({ id, app: this.app })
         this.app.scene.add(this.arrows[id].mesh)
         return this.arrows[id]
       }))

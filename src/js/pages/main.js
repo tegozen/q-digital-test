@@ -53,8 +53,7 @@ export default class Main extends React.Component {
     this.parent.appendChild(this.renderer.domElement);
     this.animate();
 
-    let arrows = await this.sphere.changeTo(1);   
-    console.log(arrows) 
+    let arrows = await this.sphere.changeTo(1);
   }
 
   componentWillUnmount() {
