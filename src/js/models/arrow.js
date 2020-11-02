@@ -15,6 +15,7 @@ export default class Arrow extends Common {
 
   init = () => {
     this.mesh = new THREE.Group()
+    this.mesh.name = 'arrow';
     let group = new THREE.Group()
     group.position.y = -(this.planeWidth * 2)
     group.rotation.y = THREE.MathUtils.degToRad(-90)
@@ -29,8 +30,7 @@ export default class Arrow extends Common {
 
     let _data = api.dataByid(this.id)
 
-    let triangle = this.createTriangle()
-    group.add(triangle)
+    group.add(this.createTriangle())
 
     this.mesh.add(group)
 
@@ -58,6 +58,7 @@ export default class Arrow extends Common {
     mesh.rotation.x = THREE.MathUtils.degToRad(-90)
     mesh.rotation.z = THREE.MathUtils.degToRad(90)
     mesh.position.x = this.planeHeight + this.planeWidth
+    this.triangle = mesh;
     return mesh
   }
 }

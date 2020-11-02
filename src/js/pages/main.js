@@ -17,10 +17,12 @@ export default class Main extends React.Component {
   clientY;
   mouseDownLon;
   mouseDownLat;
+  mouse = new THREE.Vector2();
   lon = 0;
   lat = 0;
   phi = 0;
   theta = 0;
+  arrows = [];
 
   async componentDidMount() {
     this.initEvents();
@@ -36,9 +38,11 @@ export default class Main extends React.Component {
     this.light.position.z = 10;
     this.scene.add(this.light)
     this.renderer = new THREE.WebGLRenderer();
+    this.raycaster = new THREE.Raycaster();
 
     this.sphere = new Models.Sphere({ app: this })
     await this.sphere.init();
+    this.sphere.mesh.name = 'main'
     this.scene.add(this.sphere.mesh);
 
 
@@ -53,7 +57,7 @@ export default class Main extends React.Component {
     this.parent.appendChild(this.renderer.domElement);
     this.animate();
 
-    let arrows = await this.sphere.changeTo(1);
+    await this.sphere.changeTo(1);
   }
 
   componentWillUnmount() {
@@ -83,8 +87,51 @@ export default class Main extends React.Component {
     }
   }
 
-  onMouseUp = (event) => {
+  onMouseUp = ({ clientX, clientY }) => {
+    let deltaX = Math.abs(clientX - this.clientX),
+      deltaY = Math.abs(clientY - this.clientY);
+
+    this.mouse = {
+      x: (clientX / window.innerWidth) * 2 - 1,
+      y: - (clientY / window.innerHeight) * 2 + 1
+    };
+
+    if (deltaX < 20 && deltaY < 20) {
+      let arrow = this.detectClickByArrow();
+      if (arrow) {
+        
+      }
+    }
+
+    this.clientX = undefined
+    this.clientY = undefined
     this.isMouseDown = false
+  }
+
+  detectClickByArrow = () => {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    let intersects = this.raycaster.intersectObjects(this.scene.children);
+    if (intersects && intersects.length) {
+      let main = intersects.find(({ object: { name } }) => name === 'main')
+      if (main) {
+        let distances = this.arrows.map((self) => {
+          let { id, triangle } = self;
+          let position = triangle.getWorldPosition();
+          return { id, distance: main.point.distanceTo(position), self }
+        })
+
+
+        let { self } = distances.reduce((previousValue, currentValue) => {
+          if (previousValue.distance < currentValue.distance) {
+            return previousValue
+          }
+          else return currentValue
+        })
+
+        return self
+      }
+    }
+    return false
   }
 
   onWindowResize = () => {
