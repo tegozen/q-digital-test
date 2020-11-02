@@ -61,7 +61,7 @@ export default class Main extends React.Component {
     this.parent.appendChild(this.renderer.domElement);
     requestAnimationFrame(this.animate);
 
-    await this.sphere.changeTo(1);
+    await this.sphere.changeTo(0);
   }
 
   componentWillUnmount() {
