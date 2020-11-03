@@ -1,16 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { NativeRouter, Route, Switch } from "react-router-native";
 import ROUTES from './routes';
-import Pages from './pages';
 
 export class App extends React.Component {
   render() {
     return (
-      <Router>
+      <NativeRouter>
         <Switch>
           {Object.keys(ROUTES).map((name, key) => <Route {...ROUTES[name]} key={key} />)}
         </Switch>
-      </Router>
+      </NativeRouter>
     )
   }
 }

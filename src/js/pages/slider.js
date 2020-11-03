@@ -1,10 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Connect } from '../redux';
 import ROUTES from '../routes';
 import i0 from '../../img/0.jpg'
 import i1 from '../../img/1.jpg'
 import i2 from '../../img/2.jpg'
+import style from '../../scss';
 const Images = [i0, i1, i2];
 
 export class Slider extends React.Component {
@@ -19,7 +21,7 @@ export class Slider extends React.Component {
 
   componentDidMount() {
     fetch('https://imagesapi.osora.ru').then(res => res.json()).then(images => {
-      this.props.setRedux({ Remote: images })
+      this.props.setRedux({ Remote: images.map(uri => ({ uri })) })
       this.setState({ isLoading: false })
     })
   }
@@ -50,16 +52,24 @@ export class Slider extends React.Component {
     const { isLocal, count, isLoading } = this.state;
     const images = this.getImages()
     return (
-      <div className="page">
-        {isLoading && <div className="preloader">Загрузка</div>}
-        <div className="sliderWrapper">
-          <div onClick={this.onPrev} className="button">prev</div>
-          <img className="slider" alt="" src={images[count]} />
-          <div onClick={this.onNext} className="button">next</div>
-        </div>
-        <div onClick={this.onSwitch} className="button button_switch">switch to {isLocal ? 'remote' : 'local'}</div>
-        <Link to={ROUTES.main.path} className="button">back to main</Link>
-      </div>
+      <View style={style.page}>
+        {isLoading && <Text style={style.preloader}>Загрузка</Text>}
+        <View style={style.sliderWrapper}>
+          <TouchableOpacity style={style.button} onPress={this.onPrev}>
+            <Text style={style.button__text}>prev</Text>
+          </TouchableOpacity>
+          <Image style={style.slider} source={images[count]} />
+          <TouchableOpacity style={style.button} onPress={this.onNext}>
+            <Text style={style.button__text}>next</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={this.onSwitch} style={{ ...style.button, ...style.button_switch }}>
+          <Text style={style.button__text}>switch to {isLocal ? 'remote' : 'local'}</Text>
+        </TouchableOpacity>
+        <Link style={style.button} to={ROUTES.main.path} >
+          <Text style={style.button__text}>back to main</Text>
+        </Link>
+      </View>
     )
   }
 }
