@@ -1,0 +1,2 @@
+export const SET_REDUX = 'SET_REDUX';
+export const SET_TESTSINGLEACTION = 'SET_TESTSINGLEACTION';
