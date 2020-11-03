@@ -14,45 +14,36 @@ const data = [
     id: 1,
     path: "locations/pano_2.png",
     coords: {
-      x: 0,
+      x: 1,
       y: 0,
-      z: -1
+      z: 0
     },
     description: 'у пекарни',
-    siblings: [0, 4, 5]
+    siblings: [0, 5],
+    direction: 130
   },
   {
     id: 2,
     path: "locations/pano_3.png",
     coords: {
-      x: -2,
+      x: 1.5,
       y: 0,
-      z: -1
+      z: 1
     },
     description: 'возле рекламы',
-    siblings: [0, 4]
+    siblings: [0],
+    direction: 90
   },
   {
     id: 3,
     path: "locations/pano_4.png",
     coords: {
-      x: 0,
+      x: -1,
       y: 0,
-      z: 1
+      z: 0
     },
     description: 'напротив пекарни',
     siblings: [0, 7]
-  },
-  {
-    id: 4,
-    path: "locations/pano_2_1.png",
-    coords: {
-      x: -1,
-      y: 0,
-      z: -1
-    },
-    description: 'между пекарней и рекламой',
-    siblings: [1, 2]
   },
   {
     id: 5,
@@ -60,29 +51,31 @@ const data = [
     coords: {
       x: 1,
       y: 0,
-      z: -0.75
+      z: -10
     },
     description: 'слева от пекарни',
-    siblings: [1, 6]
+    siblings: [1, 6],
+    direction: 90
   },
   {
     id: 6,
     path: "locations/pano_2_2_1.png",
     coords: {
-      x: 2,
+      x: 1,
       y: 0,
-      z: -0.75
+      z: -20
     },
     description: 'еще левее пекарни',
-    siblings: [5]
+    siblings: [5],
+    direction: 90
   },
   {
     id: 7,
     path: "locations/pano_4_1.png",
     coords: {
-      x: -0.17,
+      x: -2,
       y: 0,
-      z: 1.69
+      z: 0
     },
     description: 'еще дальше от пекарни',
     siblings: [3]

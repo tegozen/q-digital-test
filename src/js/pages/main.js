@@ -154,9 +154,10 @@ export default class Main extends React.Component {
 
   cameraToMarker = (arrow) => {
     const siblingData = data.find(({ id }) => id === arrow.id);
+    const currentData = data.find(({ id }) => id === this.currentId);
 
     const unit_vec = this.getUnicVector(
-      { x: 0, y: 0, z: 0 },
+      currentData.coords,
       siblingData.coords
     );
 
@@ -194,7 +195,11 @@ export default class Main extends React.Component {
     };
 
     setTimeout(() => {
-
+      this.scene.children.forEach(mesh => {
+        if (mesh.name === 'testMesh') {
+          this.scene.remove(mesh)
+        }
+      })
       this.arrows.forEach(arrow => {
         this.scene.remove(arrow.mesh)
       })

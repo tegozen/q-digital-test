@@ -3,11 +3,15 @@ import data from '../data';
 import Arrow from './arrow';
 
 export default class Location {
-  constructor({ app, path, siblings, id }) {
+  constructor({ app, path, siblings, id, direction }) {
     this.path = path;
     this.app = app;
     this.id = id;
     this.siblings = siblings;
+    this.direction = 0
+    if (direction) {
+      this.direction = direction;
+    }
   }
 
   load = () => {

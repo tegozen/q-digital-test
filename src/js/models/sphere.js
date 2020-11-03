@@ -43,11 +43,17 @@ export default class Sphere extends Common {
     }
 
     this.mesh.material.map = location.texture;
+    this.app.currentId = index;
+
+    this.changeRotate(location.direction)
     if (isGenerateArrows) {
       this.app.arrows = await location.generateArrows();
     }
-    this.app.currentId = index;
     return this.app.arrows
+  }
+
+  changeRotate = (deg) => {
+    this.mesh.rotation.y = THREE.MathUtils.degToRad(deg)
   }
 
   changePosition = (x = 0, y = 0, z = 0) => {

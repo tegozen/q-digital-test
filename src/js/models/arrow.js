@@ -34,14 +34,46 @@ export default class Arrow extends Common {
 
     this.mesh.add(group)
 
-    let { x, y, z } = _data.coords;
-    this.lookAt(new THREE.Vector3(x, y, z))
+    let testMesh;
+    if (false) {
+      let testGeo = new THREE.SphereGeometry(.1, 32, 32)
+      let testMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide, });
+      testMesh = new THREE.Mesh(testGeo, testMaterial)
+      testMesh.name = 'testMesh';
+      this.app.scene.add(testMesh)
+    }
+
+    const currentData = data.find(({ id }) => id === this.app.currentId);
+
+    const unit_vec = this.app.getUnicVector(
+      currentData.coords,
+      _data.coords
+    );
+
+
+
+    const coefficient = 1;
+    const newCoords = {
+      x: unit_vec.x * coefficient,
+      y: unit_vec.y * coefficient,
+      z: unit_vec.z * coefficient,
+    };
+
+    if (testMesh) {
+      testMesh.position.set(newCoords.x, newCoords.y, newCoords.z)
+    }
+
+    this.lookAt(new THREE.Vector3(
+      newCoords.x,
+      newCoords.y,
+      newCoords.z
+    ))
   }
 
   lookAt = (x = 0, y = 0, z = 0) => {
     this.mesh.lookAt(x, y, z)
-    this.mesh.rotation.x = 0
-    this.mesh.rotation.z = 0
+    // this.mesh.rotation.x = 0
+    // this.mesh.rotation.z = 0
   }
 
   createTriangle = () => {
