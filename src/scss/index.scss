@@ -59,3 +59,18 @@ body,
   justify-content: center;
   align-items: center;
 }
+
+#tooltipTitle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  z-index: 999;
+  background-color: black;
+  color: white;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  font-size: 18px;
+}

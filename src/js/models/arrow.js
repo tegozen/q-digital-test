@@ -10,6 +10,7 @@ export default class Arrow extends Common {
     this.app = props.app;
     this.planeWidth = .1;
     this.planeHeight = .3;
+    this.data = api.dataByid(this.id);
     this.init()
   }
 

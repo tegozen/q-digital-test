@@ -3,8 +3,9 @@ import * as THREE from 'three';
 import Models from '../models';
 import data from '../data'
 import TWEEN from "@tweenjs/tween.js";
+import { Connect } from '../redux';
 
-export default class Main extends React.Component {
+export class Main extends React.Component {
   EVENTS = [
     { event: 'mousedown', handler: 'onMouseDown' },
     { event: 'mousemove', handler: 'onMouseMove' },
@@ -85,6 +86,25 @@ export default class Main extends React.Component {
   }
 
   onMouseMove = ({ clientX, clientY }) => {
+    this.mouse = {
+      x: (clientX / window.innerWidth) * 2 - 1,
+      y: - (clientY / window.innerHeight) * 2 + 1
+    };
+
+    this.props.setRedux({
+      mouse: {
+        left: clientX + 10,
+        top: clientY
+      }
+    })
+
+    let arrow = this.detectClickByArrow();
+    if (arrow && arrow.data && arrow.data.description) {
+      if (this.props.tooltipTitle !== arrow.data.description) {
+        this.props.setRedux({ tooltipTitle: arrow.data.description })
+      }
+    }
+
     if (this.isMouseDown) {
       this.lon = (this.clientX - clientX) * this.camera.fov / this.cameraD + this.mouseDownLon;
       this.lat = (clientY - this.clientY) * this.camera.fov / this.cameraD + this.mouseDownLat;
@@ -117,10 +137,10 @@ export default class Main extends React.Component {
     let intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects && intersects.length) {
       let main = intersects.find(({ object: { name } }) => name === 'main')
-      if (main) {
+      if (main && this.arrows && this.arrows.length) {
         let distances = this.arrows.map((self) => {
           let { id, triangle } = self;
-          let position = triangle.getWorldPosition();
+          let position = triangle.getWorldPosition(new THREE.Vector3());
           return { id, distance: main.point.distanceTo(position), self, position }
         })
 
@@ -153,6 +173,17 @@ export default class Main extends React.Component {
   }
 
   cameraToMarker = (arrow) => {
+    this.scene.children.forEach(mesh => {
+      if (mesh.name === 'testMesh') {
+        this.scene.remove(mesh)
+      }
+    })
+    this.arrows.forEach(arrow => {
+      this.scene.remove(arrow.mesh)
+    })
+
+    this.arrows = []
+    this.props.setRedux({ tooltipTitle: '' })
     const siblingData = data.find(({ id }) => id === arrow.id);
     const currentData = data.find(({ id }) => id === this.currentId);
 
@@ -195,16 +226,6 @@ export default class Main extends React.Component {
     };
 
     setTimeout(() => {
-      this.scene.children.forEach(mesh => {
-        if (mesh.name === 'testMesh') {
-          this.scene.remove(mesh)
-        }
-      })
-      this.arrows.forEach(arrow => {
-        this.scene.remove(arrow.mesh)
-      })
-
-      this.arrows = []
 
 
       new TWEEN.Tween(settings)
@@ -262,6 +283,12 @@ export default class Main extends React.Component {
   }
 
   render() {
-    return <div className="page" id="threejs" />
+    const { left, top } = this.props.mouse;
+    return <>
+      <div className="page" id="threejs" />
+      {this.props.tooltipTitle && <div id="tooltipTitle" style={{ left, top }}>{this.props.tooltipTitle}</div>}
+    </>
   }
 }
+
+export default Connect(Main)
