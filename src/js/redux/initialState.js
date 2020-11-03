@@ -5,7 +5,9 @@ export const InitialState = {
   mouse: {
     left: 0,
     top: 0
-  }
+  },
+  isMapOpened: false,
+  currentId: 0
 }
 
 export default InitialState;

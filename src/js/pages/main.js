@@ -4,6 +4,7 @@ import Models from '../models';
 import data from '../data'
 import TWEEN from "@tweenjs/tween.js";
 import { Connect } from '../redux';
+import Components from '../components';
 
 export class Main extends React.Component {
   EVENTS = [
@@ -45,13 +46,13 @@ export class Main extends React.Component {
     this.renderer = new THREE.WebGLRenderer();
     this.raycaster = new THREE.Raycaster();
 
-    this.sphere = new Models.Sphere({ app: this })
+    this.sphere = new Models.Sphere({ app: this, setRedux: this.props.setRedux })
     await this.sphere.init();
     this.sphere.mesh.name = 'main'
     this.scene.add(this.sphere.mesh);
 
 
-    this.sphereOther = new Models.Sphere({ app: this })
+    this.sphereOther = new Models.Sphere({ app: this, setRedux: this.props.setRedux })
     await this.sphereOther.init(0);
     this.sphereOther.mesh.position.z = this.sphereOther.defaultPos;
     this.scene.add(this.sphereOther.mesh);
@@ -111,7 +112,7 @@ export class Main extends React.Component {
     }
   }
 
-  onMouseUp = ({ clientX, clientY }) => {
+  onMouseUp = ({ clientX, clientY, target }) => {
     let deltaX = Math.abs(clientX - this.clientX),
       deltaY = Math.abs(clientY - this.clientY);
 
@@ -122,7 +123,15 @@ export class Main extends React.Component {
 
     if (deltaX < 20 && deltaY < 20) {
       let arrow = this.detectClickByArrow();
-      if (arrow) {
+      if (
+        arrow
+        &&
+        !target.classList.contains('map')
+        &&
+        !target.classList.contains('map__container')
+        &&
+        !target.classList.contains('map__container__dot')
+      ) {
         this.cameraToMarker(arrow)
       }
     }
@@ -172,7 +181,7 @@ export class Main extends React.Component {
     }
   }
 
-  cameraToMarker = (arrow) => {
+  cameraToMarker = (arrow, hasAnimation = true) => {
     this.scene.children.forEach(mesh => {
       if (mesh.name === 'testMesh') {
         this.scene.remove(mesh)
@@ -199,23 +208,26 @@ export class Main extends React.Component {
       z: unit_vec.z * coefficient,
     };
 
-    this.camera.target.x = newCoords.x;
-    this.camera.target.y = 0;
-    this.camera.target.z = newCoords.z
+    if (hasAnimation) {
+      this.camera.target.x = newCoords.x;
+      this.camera.target.y = 0;
+      this.camera.target.z = newCoords.z
 
-    this.radius = (Math.hypot(...Object.values(newCoords)))
-    this.phi = Math.acos(newCoords.y / this.radius);
-    this.theta = Math.atan2(newCoords.z, newCoords.x);
-    this.lon = THREE.Math.radToDeg(this.theta);
-    this.lat = 90 - THREE.Math.radToDeg(this.phi);
+      this.radius = (Math.hypot(...Object.values(newCoords)))
+      this.phi = Math.acos(newCoords.y / this.radius);
+      this.theta = Math.atan2(newCoords.z, newCoords.x);
+      this.lon = THREE.Math.radToDeg(this.theta);
+      this.lat = 90 - THREE.Math.radToDeg(this.phi);
 
-    this.sphereOther.changePosition(
-      newCoords.x,
-      newCoords.y,
-      newCoords.z
-    )
 
-    this.sphereOther.changeTo(arrow.id, false)
+      this.sphereOther.changePosition(
+        newCoords.x,
+        newCoords.y,
+        newCoords.z
+      )
+
+      this.sphereOther.changeTo(arrow.id, false)
+    }
 
     let settings = {
       x: this.sphereOther.mesh.position.x,
@@ -235,7 +247,7 @@ export class Main extends React.Component {
           z: this.sphere.mesh.position.z,
           opacityOther: 1,
           opacityMain: 0
-        }, 2500)
+        }, hasAnimation ? 500 : 0)
         .onUpdate(() => {
           this.sphereOther.changeOpacity(settings.opacityOther)
           this.sphereOther.changePosition(
@@ -251,7 +263,7 @@ export class Main extends React.Component {
           this.sphere.changeTo(arrow.id)
           this.sphere.changeOpacity(1)
         })
-    }, 500);
+    }, hasAnimation ? 500 : 0);
 
 
   }
@@ -287,6 +299,7 @@ export class Main extends React.Component {
     return <>
       <div className="page" id="threejs" />
       {this.props.tooltipTitle && <div id="tooltipTitle" style={{ left, top }}>{this.props.tooltipTitle}</div>}
+      <Components.Map app={this} />
     </>
   }
 }

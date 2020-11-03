@@ -9,6 +9,7 @@ export default class Sphere extends Common {
     super(props);
     this.app = props.app;
     this.defaultPos = -10;
+    this.setRedux = props.setRedux;
   }
 
   init = async (opacity = 1) => {
@@ -44,6 +45,7 @@ export default class Sphere extends Common {
 
     this.mesh.material.map = location.texture;
     this.app.currentId = index;
+    this.setRedux({ currentId: index })
 
     this.changeRotate(location.direction)
     if (isGenerateArrows) {
